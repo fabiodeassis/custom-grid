@@ -1,0 +1,49 @@
+@function getKey($map, $key) {
+    @if map-has-key($map, $key) {
+        @return map-get($map, $key);  
+    }
+    @warn "The key #{$key} is not in the map '$map'";
+    @return null;
+};
+
+@mixin generate-cols($grid){
+    @each $prefix, $props in $grid {
+
+        $gutter: getKey($props, gutter)/2;
+        .row-#{$prefix} {
+            margin: 0 (-$gutter);
+            &:before,
+            &:after {
+                content: ' ';
+                display: table;
+            }
+            &:after {
+                clear: both;
+            }
+        }
+
+        [class^="col-#{$prefix}"],
+        [class*=" col-#{$prefix}"] {
+            float: left;
+            padding: 0 $gutter;
+        }
+
+        @each $view, $points in getKey($props, breakpoints) {
+            
+            @media screen and (min-width: nth($points, 1)) and (max-width: nth($points, 2)) {
+                
+                $cols: getKey($props, cols);
+                @for $i from 1 through $cols {
+
+                    .col-#{$prefix}-#{$view}-#{$i} {
+                        
+                        width: 100% / $cols * $i;
+
+                    }
+
+                }
+
+            }
+        }
+    }
+}
