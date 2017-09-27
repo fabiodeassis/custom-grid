@@ -1,0 +1,20 @@
+$grid: (
+    @desktop: (
+        breakpoints: (
+            xs: (0px, 480px),
+            sm: (481px, 768px),
+            md: (769px, 960px),
+            lg: (961px, 10000px)
+        ),
+        cols: 12,
+        gutter: 30px
+    ),
+    @mobile: (
+        breakpoints: (
+            low: (0px, 360px),
+            hight: (361px, 480px)
+        ),
+        cols: 6,
+        gutter: 20px
+    )
+);
