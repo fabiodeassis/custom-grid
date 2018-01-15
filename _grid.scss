@@ -1,0 +1,83 @@
+/**
+ * $grid-config: ( // NOME DO OBJETO DE CONFIGURAÇÃO
+ *   desktop: ( // NOME DO PREFIXO DE CADA FAIXA
+ *     breakpoints: ( // PREFIXO DE CADA BREAKPOINT (QUANTOS FOREM NECESSÁRIOS)
+ *       xs: (0px, 480px),
+ *       sm: (481px, 768px),
+ *       md: (769px, 960px),
+ *       lg: (961px, 10000px)
+ *     ),
+ *     min: 0px, // LARGURA MÍNIMA DE ATUAÇÃO DESTA FAIXA (esse número deve ser o mesmo do menor breakpoint)
+ *     max: 10000px, // LARGURA MÁXIMA DE ATUAÇÃO DESTA FAIXA (esse número deve ser o mesmo do maior breakpoint)
+ *     cols: 12, // NÚMERO DE COLUNAS (QUALQUER NÚMERO INTEIRO)
+ *     gutter: 3rem // ESPAÇAMENTO ENTRE AS COLUNAS
+ *   )
+ * );
+ */
+@function getKey($map, $key) {
+  @if map-has-key($map, $key) {
+    @return map-get($map, $key);
+  }
+  @warn "The key #{$key} is not in the map '$map'";
+  @return null;
+};
+
+@mixin generate-cols($grid){
+  @each $prefix, $props in $grid {
+    $gutter: getKey($props, gutter)/2;
+
+    @media screen and (min-width: getKey($props, min)) and (max-width: getKey($props, max)) {
+      .container-#{$prefix} {
+        padding: 0 ($gutter * 2);
+      }
+      .row-#{$prefix} {
+        margin: 0 (-$gutter) $gutter;
+        &:before,
+        &:after {
+          content: ' ';
+          display: table;
+        }
+        &:after {
+          clear: both;
+        }
+      }
+      [class^="spacer-#{$prefix}"],
+      [class*=" spacer-#{$prefix}"] {
+        clear: both;
+        display: none;
+        height: 0;
+        overflow: hidden;
+      }
+      [class^="col-#{$prefix}"],
+      [class*=" col-#{$prefix}"] {
+        float: left;
+        padding: 0 $gutter $gutter;
+      }
+    }
+    @each $view, $points in getKey($props, breakpoints) {
+      // Creating Media Queryes
+      @media screen and (min-width: nth($points, 1)) and (max-width: nth($points, 2)) {
+        // Creating a list of cols
+        $cols: getKey($props, cols);
+        @for $i from 1 through $cols {
+          .col-#{$prefix}-#{$view}-#{$i} {
+            width: 100% / $cols * $i;
+          }
+          .col-#{$prefix}-offset-#{$view}-#{$i} {
+            margin-left: 100% / $cols * $i;
+          }
+        }
+        // Creating View Utilities
+        .hide-#{$prefix}-#{$view} {
+          display: none;
+        }
+
+        .spacer-#{$prefix}-#{$view} {
+          display: table;
+        }
+      }
+    }
+  }
+}
+
+@include generate-cols($grid-config);
